@@ -78,7 +78,7 @@
         {% endfor %}
         {%- if new and variantsold_out == false and settings.new_lable -%}
         <div class="grid-product__tag grid-product__tag--new">
-        <img class="lazyloaded" src="{{ settings.new_lable | img_url: '60x' }}" alt="{{ new }}">
+          <img class="lazyloaded" src="{{ settings.new_lable | img_url: '60x' }}" alt="{{ new }}">  
         </div>
         {%- endif -%}
         

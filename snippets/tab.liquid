@@ -5,7 +5,7 @@
   </button>
   <div id="Product-content-{{ id }}" class="collapsible-content collapsible-content--all">
     <div class="collapsible-content__inner rte">
-      {{ content }}
+      {{ content | replace: 'src=', 'class="lazy2" data-src=' }}
     </div>
   </div>
 </div>

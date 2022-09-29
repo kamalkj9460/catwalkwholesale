@@ -13,21 +13,39 @@
       <div class="product__main-photos" data-aos data-product-single-media-group>
         <div data-product-photos class="product-slideshow">
           {%- for media in product.media -%}
-          {%- unless media.alt contains 'Wholesale_clothing' -%}
-            {%- render 'media',
-              section_id: section_id,
-              media: media,
-              featured_media: featured_media,
-              loopIndex0: forloop.index0,
-              loopIndex: forloop.index,
-              product_zoom_enable: product_zoom_enable,
-              product_zoom_size: product_zoom_size,
-              product_image_size: product_image_size,
-              isModal: isModal,
-              video_looping: video_looping,
-              video_style: video_style
-            -%}
-          {%- endunless -%}
+          {% if forloop.first %}
+              {%- unless media.alt contains 'Wholesale_clothing' -%}
+                {%- render 'media',
+                  section_id: section_id,
+                  media: media,
+                  featured_media: featured_media,
+                  loopIndex0: forloop.index0,
+                  loopIndex: forloop.index,
+                  product_zoom_enable: product_zoom_enable,
+                  product_zoom_size: product_zoom_size,
+                  product_image_size: product_image_size,
+                  isModal: isModal,
+                  video_looping: video_looping,
+                  video_style: video_style
+                -%}
+              {%- endunless -%}
+          {% else %}
+              {%- unless media.alt contains 'Wholesale_clothing' -%}
+                {%- render 'media',
+                  section_id: section_id,
+                  media: media,
+                  featured_media: featured_media,
+                  loopIndex0: forloop.index0,
+                  loopIndex: forloop.index,
+                  product_zoom_enable: product_zoom_enable,
+                  product_zoom_size: product_zoom_size,
+                  product_image_size: product_image_size,
+                  isModal: isModal,
+                  video_looping: video_looping,
+                  video_style: video_style
+                -%}
+              {%- endunless -%}
+          {%- endif -%}
           {%- endfor -%}
         </div>
 
@@ -100,8 +118,9 @@
                     {%- endif -%}
 
                     {%- assign img_url = media.preview_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
-                    <img class="animation-delay-{{ forloop.index | times: 3 }} lazyload"
-                        data-src="{{ img_url }}"
+                    <img class="animation-delay-{{ forloop.index | times: 3 }} lazyloaded lazy2 lazy3"
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+                        data-src="{{ media.preview_image | img_url: '180x' }}"
                         data-widths="[120, 360, 540, 720]"
                         data-aspectratio="{{ media.preview_image.aspect_ratio }}"
                         data-sizes="auto"

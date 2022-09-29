@@ -1,4 +1,4 @@
-var src,srcset,wnw_windowWidth,wnw_windowHeight,critical2,critical3,cls_css,lazyBackground,lazyIframe,lazyPoster,lazybg,lazybg2,s,i,flag=1,external_single_loaded=1;
+var src,srcset,wnw_windowWidth,wnw_windowHeight,critical2,cls_css,lazyBackground,lazyIframe,lazybg,s,i,flag=1,external_single_loaded=1;
 
 document.addEventListener("DOMContentLoaded", function() {
 	wnw_windowWidth=screen.width;
@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", function() {
 	window.addEventListener("touchstart", function() {
 		wnw_init();
 	});
+	setTimeout(function() {
+		wnw_init();
+	}, 8000);
 });
 
 function wnw_init() {
@@ -41,19 +44,19 @@ function lazyLoadImg() {
 	var imgs = document.querySelectorAll("img.lazy2");
 
 	for (i = 0; i < imgs.length; i++) {
-			if (wnw_windowWidth < 600) {
-				src = (imgs[i].dataset.mobsrc === undefined) ? imgs[i].dataset.src : imgs[i].dataset.mobsrc;
-			} else {
-				src = (imgs[i].dataset.src === undefined) ? imgs[i].src : imgs[i].dataset.src;
-			}
-			srcset = imgs[i].getAttribute("data-srcset") ? imgs[i].getAttribute("data-srcset") : "";
-			if (src != null && src != "") {
-				imgs[i].src = src;
-			}
-			if (srcset != null && srcset != "") {
-				imgs[i].srcset = srcset;
-			}
-			imgs[i].classList.remove("lazy2");
+		if (wnw_windowWidth < 600) {
+			src = (imgs[i].dataset.mobsrc === undefined) ? imgs[i].dataset.src : imgs[i].dataset.mobsrc;
+		} else {
+			src = (imgs[i].dataset.src === undefined) ? imgs[i].src : imgs[i].dataset.src;
+		}
+		srcset = imgs[i].getAttribute("data-srcset") ? imgs[i].getAttribute("data-srcset") : "";
+		if (src != null && src != "") {
+			imgs[i].src = src;
+		}
+		if (srcset != null && srcset != "") {
+			imgs[i].srcset = srcset;
+		}
+		imgs[i].classList.remove("lazy2");
 	}
 }
 
@@ -62,7 +65,7 @@ function lazyLoadImg2() {
 
 	for (i = 0; i < imgs.length; i++) {
 		var elemRect = imgs[i].getBoundingClientRect();
-        if (elemRect.top != 0 && elemRect.top - wnw_windowHeight < 0) {
+		if (elemRect.top != 0 && elemRect.top - wnw_windowHeight < 1) {
 			if (wnw_windowWidth < 600) {
 				src = (imgs[i].dataset.mobsrc === undefined) ? imgs[i].dataset.src : imgs[i].dataset.mobsrc;
 			} else {
@@ -96,19 +99,19 @@ function lazyLoadBackground() {
 }
 
 function lazyLoadBackground2() {
-	lazyBackground = document.querySelectorAll(".lazybg2");
+	lazyBackground = document.querySelectorAll(".lazybg");
 	lazyBackground.forEach(function(a) {
 		var elemRect = a.getBoundingClientRect();
-        if (elemRect.top != 0 && elemRect.top - wnw_windowHeight < 0) {
-            if (wnw_windowWidth < 600) {
-                lazybg = (a.dataset.mobstyle === undefined) ? a.dataset.style : a.dataset.mobstyle;
-            } else {
-                lazybg = (a.dataset.style === undefined) ? a.style : a.dataset.style;
-            }
-            if (lazybg != null && lazybg != "") {
-                a.style = lazybg;
-            }
-            a.classList.remove("lazybg2");
+		if (elemRect.top != 0 && elemRect.top - wnw_windowHeight < 100) {
+			if (wnw_windowWidth < 600) {
+				lazybg = (a.dataset.mobstyle === undefined) ? a.dataset.style : a.dataset.mobstyle;
+			} else {
+				lazybg = (a.dataset.style === undefined) ? a.style : a.dataset.style;
+			}
+			if (lazybg != null && lazybg != "") {
+				a.style = lazybg;
+			}
+			a.classList.remove("lazybg");
 		}
 	});
 }
@@ -145,15 +148,14 @@ function lazyLoadIframe() {
 	});
 }
 
-		
-function lazyLoadPoster() {	
-	var lazyPoster = document.querySelectorAll("video[data-poster]");	
-	lazyPoster.forEach(function(a) {	
-		if (a.dataset.poster != null && a.dataset.poster != "") {	
-			a.poster = a.dataset.poster;	
-			delete a.dataset.poster;	
-		}	
-	});	
+function lazyLoadPoster() {
+	lazyPoster = document.querySelectorAll("video[data-poster]");
+	lazyPoster.forEach(function(a) {
+		if (a.dataset.poster != null && a.dataset.poster != "") {
+			a.poster = a.dataset.poster;
+			delete a.dataset.poster;
+		}
+	});
 }
 
 function w3_load_js_uri(static_script) {
@@ -178,7 +180,7 @@ function w3_load_inline_js_single(script) {
 	if (!external_single_loaded) {
 		setTimeout(function() {
 			w3_load_inline_js_single(script);
-		}, 100);
+		}, 200);
 		return false;
 	}
 	s = document.createElement("script");
@@ -196,7 +198,7 @@ function w3_load_inline_js_single(script) {
 function lazyLoadScripts() {
 	var static_script = document.querySelectorAll("script[type=lazyload2]");
 	if (static_script.length < 1) {
-      	document.body.classList.add("wnw_loaded");
+		document.body.classList.add("wnw_loaded");
 		fullJSLoadedCB();
 		return;
 	}
@@ -225,6 +227,16 @@ function wnwAnalytics() {
 	});
 }
 
+function wnwBoomerang() {
+	var script2 = document.querySelectorAll(".boomerang");
+	script2.forEach(function(boomerangScript) {
+		window.BOOMR.version=false;
+		s = document.createElement("script");
+		s.innerHTML = boomerangScript.innerHTML;
+		insertAfter(s, boomerangScript);
+		boomerangScript.parentNode.removeChild(boomerangScript);
+	});
+}
 
 function load_all_js() {
 	if(Shopify.designMode || window.location.href.indexOf("/cart") > -1 || window.location.href.indexOf("/checkout") > -1) {
@@ -232,8 +244,9 @@ function load_all_js() {
 	} else {
 		console.log("Yes-optimization");
 		setTimeout(function() {
-			wnwAnalytics();		
-	  	},100);
+			wnwAnalytics();
+			wnwBoomerang();
+		}, 100);
 		setTimeout(function() {
 			var wnw_load_event = document.createEvent("Event");
 			wnw_load_event.initEvent("wnw_load", true, true);
@@ -246,33 +259,19 @@ function load_all_js() {
 		}, 5000);
 	}
 
-	var lazyModule = document.querySelectorAll("script[data-src2]");	
-	lazyModule.forEach(function(a) {
-        var ext_js_element = document.createElement("script");
-    	ext_js_element.src = a.getAttribute("data-src2");
-    	ext_js_element.type = a.getAttribute("type");
-    	insertAfter(ext_js_element, a);
-    	delete a.dataset.src2;
-	});	
-
 	lazyLoadScripts();
+
 	setTimeout(function() {
 		critical2 = document.querySelectorAll(".critical2");
 		critical2.forEach(function(a) {
 			a.remove();
 		});
 	}, 9999);
-	setTimeout(function() {
-		critical3 = document.querySelectorAll(".critical3");
-		critical3.forEach(function(a) {
-			a.remove();
-		});
-	}, 3000);
+
 	setInterval(function() {
 		lazyLoadImg();
 		lazyLoadIframe();
-    });
-
+	});
 }
 
 function fullJSLoadedCB() {
