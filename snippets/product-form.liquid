@@ -1,0 +1,138 @@
+
+{%- form 'product', product, id: form_id, class: 'product-single__form' -%}
+
+  {%- liquid
+    assign enable_dynamic_buttons = false
+    if show_dynamic_checkout and template != 'product.preorder'
+      assign enable_dynamic_buttons = true
+    endif
+  -%}
+
+  {%- if enable_dynamic_buttons -%}
+    <div class="payment-buttons">
+  {%- endif -%}
+
+    {%- liquid
+      assign default_text = 'products.product.add_to_cart' | t
+      assign button_text = 'products.product.add_to_cart' | t
+      if template == 'product.preorder'
+        assign default_text = 'products.product.preorder' | t
+        assign button_text = 'products.product.preorder' | t
+      endif
+      unless current_variant.available
+        assign button_text = 'products.product.sold_out' | t
+      endunless
+    -%}
+
+    <button
+      {% if product.empty? %}type="button"{% else %}type="submit"{% endif %}
+      name="add"
+      data-add-to-cart
+      class="btn btn--full add-to-cart{% if enable_dynamic_buttons and product.selling_plan_groups == empty %} btn--secondary{% endif %}"
+      {% unless current_variant.available %} disabled="disabled"{% endunless %}>
+      <span data-add-to-cart-text data-default-text="{{ default_text }}">
+        {{ button_text }}
+      </span>
+    </button>
+     
+    {%- if enable_dynamic_buttons -%}
+      {{ form | payment_button }}
+    {%- endif -%}
+
+  {%- if enable_dynamic_buttons -%}
+    </div>
+  {%- endif -%}
+
+  <div class="shopify-payment-terms product__policies">{{ form | payment_terms }}</div>
+
+  <select name="id" data-product-select class="product-single__variants no-js">
+    {%- for variant in product.variants -%}
+    {% if variant.title contains 'PIECE' %}
+    {%- assign packCount = variant.title | split: "/" -%}
+    {%- assign packCounts = packCount[1] | split: " " -%}
+    {%- assign productPrice = variant.price | divided_by: packCounts[2] -%}
+    {%- assign productComparePrice = variant.compare_at_price | divided_by: packCounts[2] -%}
+    {% endif %}
+        <option {% if variant == product.selected_or_first_available_variant %}
+          selected="selected"{% endif %}
+          value="{{ variant.id }}" data-title="{{ variant.title }}" data-name="{{product.title}} - {{variant.title}}" data-maxqty="{{ variant.inventory_quantity }}" data-price="{{productPrice | money}}" data-sale-price="{{productComparePrice | money}}" data-available="{% if variant.available %}available{% else %}notAvailable{% endif %}">
+          {{ variant.title }} - {{ variant.price | money_with_currency }}
+        </option>
+    {%- endfor -%}
+  </select>
+
+  <textarea data-variant-json class="hide" aria-hidden="true" aria-label="Product JSON">
+    {{ product.variants | json }}
+  </textarea>
+  {%- if product.options.size > 1 -%}
+    <textarea data-current-variant-json class="hide" aria-hidden="true" aria-label="Variant JSON">
+      {{ current_variant | json }}
+    </textarea>
+  {%- endif -%}
+{%- endform -%}
+
+
+
+<div class="sold-out_content" style="display:none;">
+  <div class="sold-out_custom">
+    <h3>Custom Production</h3>
+    <p>Please email us for custom production of min 50 pieces</p>
+  </div>
+  <div class="sold-out_form">
+ 	 {%- assign contact_form_id = 'contact-' | append: section.id -%}
+
+  {%- form 'contact', id: contact_form_id -%}
+    <div id="Product-content-{{ section.id }}">
+      <div class="rte">
+        <div class="form-vertical">
+          <input type="hidden" name="contact[product]" value="Product question for: {{ shop.secure_url }}{{ product.url }}">
+
+          <div class="grid grid--small">
+            <div class="grid__item medium-up--one-half">
+              <label for="ContactFormName-{{ section.id }}">{{ 'contact.form.name' | t }}</label>
+              <input type="text" id="ContactFormName-{{ section.id }}" class="input-full" name="contact[name]" autocapitalize="words" value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}">
+            </div>
+
+            <div class="grid__item medium-up--one-half">
+              <label for="ContactFormEmail-{{ section.id }}">{{ 'contact.form.email' | t }}</label>
+              <input type="email" id="ContactFormEmail-{{ section.id }}" class="input-full" name="contact[email]" autocorrect="off" autocapitalize="off" value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}">
+            </div>
+          </div>
+
+          {%- if section.settings.phone -%}
+            <label for="ContactFormPhone-{{ section.id }}">{{ 'contact.form.phone' | t }}</label>
+            <input type="tel" id="ContactFormPhone-{{ section.id }}" class="input-full" name="contact[phone]" pattern="[0-9\-]*" value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}">
+          {%- endif -%}
+
+          <label for="ContactFormMessage-{{ section.id }}">{{ 'contact.form.message' | t }}</label>
+          <textarea rows="5" id="ContactFormMessage-{{ section.id }}" class="input-full" name="contact[body]">{% if form.body %}{{ form.body }}{% endif %}</textarea>
+
+          <button type="submit" class="btn">
+            {{ 'contact.form.send' | t }}
+          </button>
+
+          {% comment %}
+            Remove the following three lines of code to remove the note
+            about being protected by Google's reCAPTCHA service.
+            By removing it, the small reCAPTCHA widget will appear in the
+            bottom right corner of the page.
+          {% endcomment %}
+      
+        </div>
+      </div>
+    </div>
+
+    {%- if form.posted_successfully? -%}
+      <p class="note note--success">
+        {{ 'contact.form.post_success' | t }}
+      </p>
+    {%- endif -%}
+
+    {%- if form.product -%}
+      {{ form.errors | default_errors }}
+    {%- endif -%}
+  {%- endform -%}
+</div>
+</div>
+
+
